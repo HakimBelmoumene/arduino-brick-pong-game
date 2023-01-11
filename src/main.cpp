@@ -13,12 +13,21 @@
 int best_score = 0;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire,OLED_RESET);
 int x_pos = 55;
+int y_pos = 55;
 int score=0;
+
+
 int up;
 int down;
-int left;
-int right;
-String button;
+int left=22;
+int right=18;
+int beta = 2;
+int alpha =0;
+int x_ball=63;
+int y_ball=52;
+
+int delta_x=0;
+int delta_y=1;
 
 const unsigned char solo [] PROGMEM = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
@@ -129,22 +138,23 @@ void game_start(){
 
 void paddle(){
   //the paddle controlled by the player
-  for(int x_pos=55; x_pos<= 110; x_pos++){
-    display.fillRect(x_pos,55,18,4,SSD1306_WHITE);
-    display.display();
-    delay(10);
-    //display.clearDisplay();
-  }
-  for (int x_pos= 110; x_pos>=0; x_pos--){
-    display.fillRect(x_pos,55,18,4,SSD1306_WHITE);
-    display.display();
-    delay(10);
-    //display.clearDisplay();
-  }
-}
-void ball(){
-  display.fillCircle(63,52,2,SSD1306_WHITE);
+  
+  display.fillRect(x_pos,y_pos,18,4,SSD1306_WHITE);
   display.display();
+}
+
+void ball(){
+  display.fillCircle(x_ball,y_ball,2,SSD1306_WHITE);
+  display.display();
+}
+
+void ball_collision(){
+  int tmp= x_ball+2;
+  int tmp_y = y_ball+2;
+  if((tmp>=x_pos||(x_ball+2)<=tmp) && tmp_y==y_pos){
+    delta_x+=alpha;
+    delta_y=-delta_y;
+  }
 }
 
 void game_over(){
@@ -184,10 +194,20 @@ void display_score(){
 void paddle_control(){
   //controls for the paddle
   if(digitalRead(left) == 1){
-    x_pos+=10;
+    if( x_pos<110){
+      x_pos+=10;
+      alpha = beta;
+    }
+    
   }
   else if (digitalRead(right)==1){
-    x_pos-=10;
+    if( x_pos>0){
+      x_pos-=10;
+      alpha = -beta;
+    }
+  }
+  else{
+    alpha=0;
   }
 }
 
@@ -218,9 +238,19 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   display_score();
+  Serial.print("left");
+  Serial.println(digitalRead(left));
+  Serial.print("right");
+  Serial.println(digitalRead(right));
   bricks();
   ball();
   paddle();
-}
+  //game_over();
+  //paddle_control();
+  ball_collision();
+  x_ball+=delta_x;
+  y_ball+=delta_y;
+  display.clearDisplay();
+  }
 
 
