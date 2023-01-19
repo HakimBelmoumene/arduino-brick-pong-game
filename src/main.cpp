@@ -24,7 +24,7 @@ int right=18;
 int beta = 2;
 int alpha =0;
 int x_ball=63;
-int y_ball=52;
+int y_ball=42;
 
 int delta_x=0;
 int delta_y=1;
@@ -147,11 +147,11 @@ void ball(){
   display.fillCircle(x_ball,y_ball,2,SSD1306_WHITE);
   display.display();
 }
-
-void ball_collision(){
+//not finished top is to determine if the ball will collide from the top or buttom
+void ball_collision(int x, int y, int len, int height, bool top){
   int tmp= x_ball+2;
   int tmp_y = y_ball+2;
-  if((tmp>=x_pos||(x_ball+2)<=tmp) && tmp_y==y_pos){
+  if((tmp>=x||(x_ball+2)<=tmp) && tmp_y==y_pos){
     delta_x+=alpha;
     delta_y=-delta_y;
   }
